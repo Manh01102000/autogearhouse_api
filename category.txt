@@ -1,0 +1,68 @@
+Danh Mục Ô Tô & Danh Mục Con
+
+1️ Sedan
+
+Sedan hạng A (City Car) → Xe cỡ nhỏ, giá rẻ
+Sedan hạng B (Compact Sedan) → Xe phổ thông, tiết kiệm nhiên liệu
+Sedan hạng C (Mid-size Sedan) → Xe tầm trung, rộng rãi hơn
+Sedan hạng D (Full-size Sedan) → Xe cao cấp, tiện nghi hơn
+Sedan hạng sang (Luxury Sedan) → Xe cao cấp, nhiều công nghệ
+Sedan thể thao (Sport Sedan) → Xe mạnh mẽ, hiệu suất cao
+
+2️ SUV (Sport Utility Vehicle)
+
+SUV cỡ nhỏ (Compact SUV) → Gầm cao, tiện dụng, tiết kiệm nhiên liệu
+SUV cỡ trung (Mid-size SUV) → Rộng rãi, phù hợp gia đình
+SUV cỡ lớn (Full-size SUV) → Cao cấp, động cơ mạnh, nhiều chỗ ngồi
+SUV hạng sang (Luxury SUV) → Tiện nghi cao cấp, công nghệ tiên tiến
+SUV off-road → Chuyên chạy địa hình, hệ dẫn động 4WD
+
+3️ Crossover (CUV - Crossover Utility Vehicle)
+
+Crossover cỡ nhỏ (Compact CUV) → Gọn nhẹ, tiết kiệm nhiên liệu
+Crossover cỡ trung (Mid-size CUV) → Đa dụng, rộng rãi hơn
+Crossover cỡ lớn (Full-size CUV) → Cao cấp, nhiều công nghệ
+Crossover coupe → Thiết kế thể thao, mui dốc
+
+4️ Hatchback
+
+Hatchback cỡ nhỏ (Mini Hatchback) → Tiết kiệm nhiên liệu, phù hợp đô thị
+Hatchback cỡ trung (Compact Hatchback) → Đa dụng, rộng rãi hơn
+Hot Hatch (Hatchback thể thao) → Hiệu suất cao, động cơ mạnh
+
+5️ Coupe
+
+Coupe phổ thông → 2 cửa, phong cách thể thao
+Coupe hạng sang → Thiết kế cao cấp, động cơ mạnh
+Coupe hiệu suất cao (Performance Coupe) → Tốc độ nhanh, động cơ mạnh
+
+6️ Xe thể thao (Sports Car & Supercar)
+
+Sports Car → Hiệu suất cao, giá phải chăng
+Supercar → Xe siêu tốc độ, thiết kế khí động học
+Hypercar → Công nghệ tối tân, cực mạnh, số lượng giới hạn
+
+7️ Xe bán tải (Pickup Truck)
+
+Pickup cỡ nhỏ (Compact Pickup) → Tiện dụng, tiết kiệm nhiên liệu
+Pickup cỡ trung (Mid-size Pickup) → Đa dụng, sức kéo lớn hơn
+Pickup cỡ lớn (Full-size Pickup) → Chuyên chở nặng, động cơ mạnh
+Pickup off-road → Chuyên chạy địa hình, hệ dẫn động 4WD
+
+8️ MPV (Multi-Purpose Vehicle - Xe đa dụng)
+
+MPV cỡ nhỏ (Mini MPV) → Nhỏ gọn, phù hợp gia đình nhỏ
+MPV cỡ trung (Compact MPV) → Rộng rãi hơn, nhiều tiện nghi
+MPV cỡ lớn (Full-size MPV) → Cao cấp, nhiều chỗ ngồi
+
+9️ Xe tải (Truck)
+
+Xe tải nhẹ (Light Truck) → Chở hàng nhỏ, di chuyển linh hoạt
+Xe tải trung (Medium Truck) → Tải trọng lớn hơn, chở hàng thương mại
+Xe tải nặng (Heavy Truck) → Chở hàng hóa lớn, container
+
+10 Xe buýt (Bus)
+
+Minibus → 12-16 chỗ, phù hợp du lịch nhỏ
+Xe buýt cỡ trung → 25-30 chỗ, chạy tuyến ngắn
+Xe buýt cỡ lớn → 40-50+ chỗ, chạy liên tỉnh
