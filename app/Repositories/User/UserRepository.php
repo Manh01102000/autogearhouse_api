@@ -12,6 +12,12 @@ use App\Models\Affiliate;
 use Illuminate\Support\Facades\Hash;
 // Import db transaction
 use Illuminate\Support\Facades\DB;
+// JWT
+use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -108,7 +114,6 @@ class UserRepository implements UserRepositoryInterface
             'data' => ['users' => $users],
         ];
     }
-
 
     public function searchUserAdmin(array $data)
     {
@@ -323,6 +328,54 @@ class UserRepository implements UserRepositoryInterface
             });
 
             return $result;
+        } catch (\Exception $e) {
+            \Log::error("Lỗi khi đăng ký tài khoản", [
+                'error' => $e->getMessage(),
+                'data' => []
+            ]);
+
+            return [
+                'success' => false,
+                'message' => "Lỗi server, vui lòng thử lại sau.",
+                'httpCode' => 500,
+                'data' => [],
+            ];
+        }
+    }
+
+    public function login($account, $password)
+    {
+        try {
+            $conditions = [
+                'user_email_account' => $account,
+                'password' => $password,
+            ];
+
+            /** === Dùng JWT để xác thực user === */
+            if (!$token = JWTAuth::attempt($conditions)) {
+                return apiResponse('error', 'Unauthorized', [], false, 401);
+            }
+
+            /** === Lấy dữ liệu người dùng từ === */
+            $user = Auth::user();
+
+            /** === Lấy dữ liệu chi tiết của người dùng === */
+            if ($user->user_role == '2') {
+                $user = User::with('Employees')->find($user->user_id);
+            } elseif ($user->user_role == '1') {
+                $user = User::with('Customers')->find($user->user_id);
+            }
+
+            /** === Trả kết quả === */
+            return [
+                'success' => true,
+                'message' => "Đăng nhập tài khoản thành công",
+                'httpCode' => 201,
+                'data' => [
+                    'user' => $user,
+                    'token' => $token,
+                ]
+            ];
         } catch (\Exception $e) {
             \Log::error("Lỗi khi đăng ký tài khoản", [
                 'error' => $e->getMessage(),

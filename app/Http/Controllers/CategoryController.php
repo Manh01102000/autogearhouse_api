@@ -31,6 +31,24 @@ class CategoryController extends Controller
         }
     }
 
+    public function getCategoryAll()
+    {
+        try {
+            $response = $this->CategoryRepository->getCategoryAll();
+            if ($response['success']) {
+                return apiResponse("success", $response['message'], $response['data'], true, $response['httpCode']);
+            } else {
+                return apiResponse('error', $response['message'], $response['data'], false, $response['httpCode']);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Lỗi khi lấy danh mục: ' . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => "Lỗi hệ thống: " . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function getCategoryByID($id)
     {
         try {

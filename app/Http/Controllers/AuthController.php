@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Hash;
 // JWT
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\JWTException;
+// model
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -91,26 +96,13 @@ class AuthController extends Controller
                 'account' => 'required|string|email',
                 'password' => 'required|string|min:6',
             ]);
+            $response = $this->userRepository->login($request->account, $request->password);
 
-            $conditions = [
-                'user_email_account' => $request->account,
-                'password' => $request->password,
-            ];
-
-            /** === Dùng JWT để xác thực user === */
-            if (!$token = JWTAuth::attempt($conditions)) {
-                return apiResponse('error', 'Unauthorized', [], false, 401);
+            if ($response['success']) {
+                return apiResponse("success", $response['message'], $response['data'], true, $response['httpCode']);
+            } else {
+                return apiResponse('error', $response['message'], $response['data'], false, $response['httpCode']);
             }
-            /** === Lấy dữ liệu người dùng từ === */
-            $user = Auth::user();
-
-            /** === Trả kết quả === */
-            $data_mess = [
-                'user' => $user,
-                'token' => $token,
-            ];
-
-            return apiResponse("success", "Đăng nhập thành công", $data_mess, true, 200);
         } catch (\Exception $e) {
             return response()->json([
                 'result' => false,
@@ -125,6 +117,28 @@ class AuthController extends Controller
     {
         return $this->respondWithToken(JWTAuth::refresh());
     }
+
+    public function checkToken(Request $request)
+    {
+        try {
+            // Kiểm tra xem token có tồn tại trong header không
+            if (!$token = $request->header('Authorization')) {
+                return apiResponse("error", "Token is invalid", [], false, 401);
+            }
+            $token = str_replace('Bearer ', '', $token);
+            // Xác thực token
+            JWTAuth::setToken($token)->authenticate();
+            // Trả về thông tin user hoặc quyền hạn của user
+            return apiResponse("success", "Token is valid", auth()->user(), true, 200);
+        } catch (TokenInvalidException $e) {
+            return apiResponse("error", "Token is invalid", [], false, 401);
+        } catch (TokenExpiredException $e) {
+            return apiResponse("error", "Token has expired", [], false, 401);
+        } catch (\Exception $e) {
+            return apiResponse("error", "Authorization token not found", [], false, 401);
+        }
+    }
+
 
     protected function respondWithToken($token)
     {
