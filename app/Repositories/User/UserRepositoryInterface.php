@@ -8,6 +8,7 @@ interface UserRepositoryInterface
     public function searchUserAdmin(array $data);
     public function findByID($id);
     public function create(array $data);
+    public function login($account, $password);
     public function update($id, array $data);
     public function delete($id);
     public function findByEmail(string $email);

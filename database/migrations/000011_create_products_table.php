@@ -29,7 +29,7 @@ return new class extends Migration {
             $table->integer('product_mileage')->nullable(); // Số km đã đi (cho xe cũ)
             $table->string('product_fuel_type')->nullable(); // Loại nhiên liệu (Xăng, Dầu, Điện,...)
             $table->string('product_transmission')->nullable(); // Hộp số (Số sàn, Tự động)
-            $table->decimal('product_engine_capacity', 5, 2)->nullable(); // Dung tích động cơ
+            $table->integer('product_engine_capacity')->nullable(); // Dung tích động cơ
             $table->integer('product_horsepower')->nullable(); // Công suất (HP)
             $table->string('product_torque')->nullable(); // Mô-men xoắn (Nm)
             $table->string('product_drive_type')->nullable(); // Dẫn động (FWD, RWD, AWD, ...)

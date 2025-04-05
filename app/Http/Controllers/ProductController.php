@@ -22,7 +22,10 @@ class ProductController extends Controller
             if (!$dataUser) {
                 return apiResponse('error', "Không tìm thấy người dùng", [], false, 404);
             }
+
             $user_id = $dataUser->user_id;
+
+
             // Convert JSON string "product_variants" thành array
             $productVariants = json_decode($request->input('product_variants'), true);
 
@@ -49,34 +52,25 @@ class ProductController extends Controller
                 'product_horsepower' => 'required',
                 'product_torque' => 'required',
                 'product_drive_type' => 'required',
+                'product_newold' => 'required',
                 // Thông tin ngoại thất - nội thất
                 'product_body_type' => 'required',
                 'product_seats' => 'required',
                 'product_doors' => 'required',
-                'product_airbags' => 'required',
-                'product_safety_features' => 'required',
-                // Tính năng hỗ trợ
-                'product_infotainment' => 'required',
                 'product_parking_assist' => 'required',
                 'product_cruise_control' => 'required',
                 // Thông tin thêm
-                'product_active' => 'required',
                 'category' => 'required',
                 'category_code' => 'required',
-                'category_children_code' => 'required',
                 'product_brand' => 'required',
                 // Vận chuyển
                 'product_ship' => 'required',
-                // Số lượng bán
-                'product_sold' => 'required',
                 // Validate danh sách biến thể sản phẩm
-                'product_variants' => 'required|array|min:1', // Phải có ít nhất 1 biến thể
-                'product_variants.*.variant_code' => 'required',
+                // Phải có ít nhất 1 biến thể
+                'product_variants' => 'required|array|min:1',
                 'product_variants.*.product_price' => 'required|numeric',
                 'product_variants.*.product_stock' => 'required|integer',
-                'product_variants.*.product_size' => 'required|string',
                 'product_variants.*.product_color' => 'required|string',
-                'product_variants.*.product_code_color' => 'required|string',
             ]);
 
             $data = [
@@ -101,19 +95,20 @@ class ProductController extends Controller
                 'product_infotainment' => $request->get('product_infotainment'),
                 'product_parking_assist' => $request->get('product_parking_assist'),
                 'product_cruise_control' => $request->get('product_cruise_control'),
-                'product_active' => $request->get('product_active'),
+                'product_active' => $request->get('product_active') ?? 1,
                 'category' => $request->get('category'),
                 'category_code' => $request->get('category_code'),
-                'category_children_code' => $request->get('category_children_code'),
                 'product_brand' => $request->get('product_brand'),
-                'product_images' => $request->file('product_images'),
-                'product_videos' => $request->file('product_videos'),
-                'product_ship' => $request->get('product_ship'),
-                'product_feeship' => $request->get('product_feeship'),
-                'product_sold' => $request->get('product_sold'),
+                'product_images' => $request->file('product_images') ?? '',
+                'product_videos' => $request->file('product_videos') ?? '',
+                'product_ship' => $request->get('product_ship') ?? 1,
+                'product_feeship' => $request->get('product_feeship') ?? 0,
+                'product_newold' => $request->get('product_newold') ?? 0,
+                'product_sold' => $request->get('product_sold') ?? 0,
                 'product_variants' => $request->get('product_variants'),
             ];
-
+            // var_dump($data);
+            // return apiResponse('error', "Dữ liệu product_variants không hợp lệ", $data, false, 400);
             /** === Lấy dữ liệu từ repository === **/
             $response = $this->ProductRepository->create($data);
             if ($response['success']) {
@@ -137,8 +132,7 @@ class ProductController extends Controller
             if (!$dataUser) {
                 return apiResponse('error', "Không tìm thấy người dùng", [], false, 404);
             }
-            $user_id = $dataUser->id;
-
+            $user_id = $dataUser->user_id;
             // Convert JSON string "product_variants" thành array
             $productVariants = json_decode($request->input('product_variants'), true);
 
@@ -151,9 +145,11 @@ class ProductController extends Controller
 
             // Validate request
             $request->validate([
+                // Thông tin cơ bản
                 'product_code' => 'required',
                 'product_name' => 'required',
                 'product_description' => 'required',
+                // Thông tin chung
                 'product_year' => 'required',
                 'product_model' => 'required',
                 'product_fuel_type' => 'required',
@@ -162,83 +158,81 @@ class ProductController extends Controller
                 'product_horsepower' => 'required',
                 'product_torque' => 'required',
                 'product_drive_type' => 'required',
+                'product_newold' => 'required',
+                // Thông tin ngoại thất - nội thất
                 'product_body_type' => 'required',
                 'product_seats' => 'required',
                 'product_doors' => 'required',
-                'product_airbags' => 'required',
-                'product_safety_features' => 'required',
-                'product_infotainment' => 'required',
                 'product_parking_assist' => 'required',
                 'product_cruise_control' => 'required',
-                'product_active' => 'required',
+                // Thông tin thêm
                 'category' => 'required',
                 'category_code' => 'required',
-                'category_children_code' => 'required',
                 'product_brand' => 'required',
+                // Vận chuyển
                 'product_ship' => 'required',
-                'product_sold' => 'required',
+                // Validate danh sách biến thể sản phẩm
+                // Phải có ít nhất 1 biến thể
                 'product_variants' => 'required|array|min:1',
-                'product_variants.*.variant_code' => 'required',
                 'product_variants.*.product_price' => 'required|numeric',
                 'product_variants.*.product_stock' => 'required|integer',
-                'product_variants.*.product_size' => 'required|string',
                 'product_variants.*.product_color' => 'required|string',
-                'product_variants.*.product_code_color' => 'required|string',
             ]);
 
             // Lấy dữ liệu từ request
-            $data = $request->only([
-                'product_code',
-                'product_name',
-                'product_description',
-                'product_year',
-                'product_model',
-                'product_mileage',
-                'product_fuel_type',
-                'product_transmission',
-                'product_engine_capacity',
-                'product_horsepower',
-                'product_torque',
-                'product_drive_type',
-                'product_body_type',
-                'product_seats',
-                'product_doors',
-                'product_airbags',
-                'product_safety_features',
-                'product_infotainment',
-                'product_parking_assist',
-                'product_cruise_control',
-                'product_active',
-                'category',
-                'category_code',
-                'category_children_code',
-                'product_brand',
-                'product_ship',
-                'product_feeship',
-                'product_sold',
-                'product_variants'
-            ]);
-
-            $data['user_id'] = $user_id;
-
-            // Xử lý ảnh & video (nếu có)
-            if ($request->hasFile('product_images')) {
-                $data['product_images'] = $request->file('product_images');
-            }
-            if ($request->hasFile('product_videos')) {
-                $data['product_videos'] = $request->file('product_videos');
-            }
+            $data = [
+                'user_id' => $user_id,
+                'product_code' => $request->get('product_code'),
+                'product_name' => $request->get('product_name'),
+                'product_description' => $request->get('product_description'),
+                'product_year' => $request->get('product_year'),
+                'product_model' => $request->get('product_model'),
+                'product_mileage' => $request->get('product_mileage'),
+                'product_fuel_type' => $request->get('product_fuel_type'),
+                'product_transmission' => $request->get('product_transmission'),
+                'product_engine_capacity' => $request->get('product_engine_capacity'),
+                'product_horsepower' => $request->get('product_horsepower'),
+                'product_torque' => $request->get('product_torque'),
+                'product_drive_type' => $request->get('product_drive_type'),
+                'product_body_type' => $request->get('product_body_type'),
+                'product_seats' => $request->get('product_seats'),
+                'product_doors' => $request->get('product_doors'),
+                'product_airbags' => $request->get('product_airbags'),
+                'product_safety_features' => $request->get('product_safety_features'),
+                'product_infotainment' => $request->get('product_infotainment'),
+                'product_parking_assist' => $request->get('product_parking_assist'),
+                'product_cruise_control' => $request->get('product_cruise_control'),
+                'product_active' => $request->get('product_active') ?? 1,
+                'category' => $request->get('category'),
+                'category_code' => $request->get('category_code'),
+                'product_brand' => $request->get('product_brand'),
+                'product_ship' => $request->get('product_ship') ?? 1,
+                'product_feeship' => $request->get('product_feeship') ?? 0,
+                'product_sold' => $request->get('product_sold') ?? 0,
+                'product_newold' => $request->get('product_newold') ?? 2,
+                'product_variants' => $request->get('product_variants'),
+                // Ảnh mới từ file
+                'product_images' => $request->file('product_images') ?? '',
+                // Video mới từ file
+                'product_videos' => $request->file('product_videos') ?? '',
+                // ảnh cũ
+                'product_images_old' => $request->get('product_images_old') ?? '',
+                // video cũ
+                'product_videos_old' => $request->get('product_videos_old') ?? '',
+                // ảnh bị xóa
+                'product_images_del' => $request->get('product_images_del') ?? '',
+                // video bị xóa
+                'product_videos_del' => $request->get('product_videos_del') ?? '',
+            ];
 
             // Gọi repository update
             $response = $this->ProductRepository->update($id, $data);
 
-            return apiResponse(
-                $response['success'] ? "success" : "error",
-                $response['message'],
-                $response['data'],
-                $response['success'],
-                $response['httpCode']
-            );
+            if ($response['success']) {
+                return apiResponse("success", $response['message'], $response['data'], true, $response['httpCode']);
+            } else {
+                return apiResponse('error', $response['message'], $response['data'], false, $response['httpCode']);
+            }
         } catch (\Exception $e) {
             \Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
             return response()->json([

@@ -56,6 +56,43 @@ class CategoryRepository implements CategoryRepositoryInterface
         }
     }
 
+    public function getCategoryAll()
+    {
+        try {
+            $category = $this->category::where([
+                ['cat_active', '=', 1]
+            ])->get();
+
+            if (!$category) {
+                return [
+                    'success' => false,
+                    'message' => "Không tìm thấy danh mục",
+                    'httpCode' => 404,
+                    'data' => [],
+                ];
+            }
+
+            return [
+                'success' => true,
+                'message' => "Lấy danh mục thành công",
+                'httpCode' => 200,
+                'data' => ['category' => $category],
+            ];
+        } catch (\Exception $e) {
+            \Log::error("Lỗi khi lấy danh mục", [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => "Lỗi server, vui lòng thử lại sau.",
+                'httpCode' => 500,
+                'data' => [],
+            ];
+        }
+    }
     public function getCategoryByID($id)
     {
         try {
