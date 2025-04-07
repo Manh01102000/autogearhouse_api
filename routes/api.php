@@ -43,16 +43,17 @@ Route::prefix("user")->group(function () {
     Route::post('/search-user-admin', [UserController::class, 'searchUserAdmin']);
     // API lấy thông tin người dùng theo id
     Route::get('/{id}', [UserController::class, 'getUserById'])->where('id', '[0-9]+');
-    // API cập nhật thông tin người dùng
-    Route::put('/{id}', [UserController::class, 'updateUser'])->where('id', '[0-9]+');
-    // API xóa thông tin người dùng
-    Route::delete('/{id}', [UserController::class, 'deleteUser'])->where('id', '[0-9]+');
+
     // =========Luồng API yêu cầu JWT authentication viết ở đây=========
     // + jwt.auth.custom: kiểm tra tính hợp lệ của token
     // + throttle:60,1: giới hạn số lần request (60 lần/phút) tránh DDOS hoặc spam request.
     Route::middleware(['jwt.auth.custom', 'throttle:60,1'])->group(function () {
         // API đăng xuất tài khoản
         Route::post('/logout', [AuthController::class, 'logout']);
+        // API cập nhật thông tin người dùng
+        Route::put('/{id}', [UserController::class, 'updateUser'])->where('id', '[0-9]+');
+        // API xóa thông tin người dùng
+        Route::delete('/{id}', [UserController::class, 'deleteUser'])->where('id', '[0-9]+');
     });
 
     Route::middleware(['throttle:60,1'])->group(function () {
