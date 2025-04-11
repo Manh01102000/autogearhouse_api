@@ -70,7 +70,7 @@ Route::prefix("user")->group(function () {
 Route::prefix("admin")->group(function () {
     Route::middleware(['jwt.auth.custom', 'role:2'])->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard']);
-        Route::put('/post/{post}', [PostController::class, 'update'])->middleware('can:update,post');
+        Route::put('/post/{post}', [PostController::class, 'update']);
     });
 });
 // =========================================================================
@@ -80,6 +80,10 @@ Route::prefix("products")->group(function () {
     Route::get('/', [ProductController::class, 'getAll']);
     // Lấy danh sách sản phẩm kèm tìm kiếm
     Route::post('/search', [ProductController::class, 'searchProduct']);
+    // Lấy danh sách sản phẩm mới nhất
+    Route::get('/new', [ProductController::class, 'getProductNew']);
+    // Lấy danh sách sản phẩm nổi bật
+    Route::get('/featured', [ProductController::class, 'getProductFeatured']);
     // Lấy 1 sản phẩm
     Route::get('/{id}', [ProductController::class, 'getById'])->where('id', '[0-9]+');
     // ======================== API yêu cầu Xác thực ========================

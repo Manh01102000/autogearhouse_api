@@ -68,7 +68,7 @@ class ProductController extends Controller
                 // Validate danh sách biến thể sản phẩm
                 // Phải có ít nhất 1 biến thể
                 'product_variants' => 'required|array|min:1',
-                'product_variants.*.product_price' => 'required|numeric',
+                'product_variants.*.product_price' => 'required',
                 'product_variants.*.product_stock' => 'required|integer',
                 'product_variants.*.product_color' => 'required|string',
             ]);
@@ -174,7 +174,7 @@ class ProductController extends Controller
                 // Validate danh sách biến thể sản phẩm
                 // Phải có ít nhất 1 biến thể
                 'product_variants' => 'required|array|min:1',
-                'product_variants.*.product_price' => 'required|numeric',
+                'product_variants.*.product_price' => 'required',
                 'product_variants.*.product_stock' => 'required|integer',
                 'product_variants.*.product_color' => 'required|string',
             ]);
@@ -270,6 +270,52 @@ class ProductController extends Controller
         try {
             /** === Lấy danh sách sản phẩm từ repository === **/
             $response = $this->ProductRepository->searchProduct($request->all());
+
+            return apiResponse(
+                $response['success'] ? "success" : "error",
+                $response['message'],
+                $response['data'],
+                $response['success'],
+                $response['httpCode']
+            );
+        } catch (\Exception $e) {
+            \Log::error('Lỗi khi lấy danh sách sản phẩm: ' . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => "Lỗi hệ thống: " . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Lấy sản phẩm mới nhất
+    public function getProductNew(Request $request)
+    {
+        try {
+            /** === Lấy danh sách sản phẩm từ repository === **/
+            $response = $this->ProductRepository->getProductNew($request->all());
+
+            return apiResponse(
+                $response['success'] ? "success" : "error",
+                $response['message'],
+                $response['data'],
+                $response['success'],
+                $response['httpCode']
+            );
+        } catch (\Exception $e) {
+            \Log::error('Lỗi khi lấy danh sách sản phẩm: ' . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => "Lỗi hệ thống: " . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Lấy sản phẩm nổi bật
+    public function getProductFeatured(Request $request)
+    {
+        try {
+            /** === Lấy danh sách sản phẩm từ repository === **/
+            $response = $this->ProductRepository->getProductFeatured($request->all());
 
             return apiResponse(
                 $response['success'] ? "success" : "error",
