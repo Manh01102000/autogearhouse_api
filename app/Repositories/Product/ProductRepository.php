@@ -51,6 +51,7 @@ class ProductRepository implements ProductRepositoryInterface
         }
     }
 
+    // tìm kiếm sản phẩm trong admin
     public function searchProduct(array $data)
     {
         try {
@@ -72,6 +73,167 @@ class ProductRepository implements ProductRepositoryInterface
                 $query->whereBetween("product_create_time", [$data['product_time_start'], $data['product_time_end']]);
             }
 
+            // Sắp xếp
+            $query->orderBy('product_id', 'desc')
+                ->orderBy('product_create_time', 'desc');
+
+            $query->with('productVariants');
+            $products = $query->paginate($pageSize, ['*'], 'page', $page);
+
+            foreach ($products->items() as $product) {
+                $product->product_images_full = '';
+                $product->product_videos_full = '';
+                if (!empty($product->product_images)) {
+                    $images = explode(',', $product->product_images);
+                    $fullUrls = [];
+
+                    foreach ($images as $image) {
+                        $fullUrls[] = env('DOMAIN_WEB') . getUrlImageVideoProduct($product->product_create_time, 1) . $image;
+                    }
+
+                    $product->product_images_full = implode(',', $fullUrls);
+                }
+
+                if (!empty($product->product_videos)) {
+                    $videos = explode(',', $product->product_videos);
+                    $fullUrls = [];
+
+                    foreach ($videos as $video) {
+                        $fullUrls[] = env('DOMAIN_WEB') . getUrlImageVideoProduct($product->product_create_time, 2) . $video;
+                    }
+
+                    $product->product_videos_full = implode(',', $fullUrls);
+                }
+            }
+
+            return [
+                'success' => true,
+                'message' => "Lấy sản phẩm thành công",
+                'httpCode' => 200,
+                'data' => $products,
+            ];
+
+        } catch (\Exception $e) {
+
+            \Log::error("Lỗi khi tạo sản phẩm", [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => "Lỗi server, vui lòng thử lại sau.",
+                'httpCode' => 500,
+                'data' => [],
+            ];
+        }
+    }
+    // Lấy sản phẩm mới nhất
+    public function getProductNew(array $data)
+    {
+        try {
+
+            $page = $data['page'] ?? 1;
+            $pageSize = $data['pageSize'] ?? 8;
+
+            $query = $this->Products->query();
+            // Lọc theo điều kiện nếu có
+            if (!empty($data['product_name'])) {
+                $query->where('product_name', 'LIKE', "%{$data['product_name']}%");
+            }
+
+            if (!empty($data['product_id'])) {
+                $query->where('product_id', $data['product_id']);
+            }
+
+            if (!empty(!empty($data['product_time_start']) && !empty($data['product_time_end']))) {
+                $query->whereBetween("product_create_time", [$data['product_time_start'], $data['product_time_end']]);
+            }
+            // sắp xếp
+            $query->where('product_active', 1)
+                ->orderBy('product_id', 'desc')
+                ->orderBy('product_create_time', 'desc');
+            // relation với product variant
+            $query->with('productVariants');
+            $products = $query->paginate($pageSize, ['*'], 'page', $page);
+
+            foreach ($products->items() as $product) {
+                $product->product_images_full = '';
+                $product->product_videos_full = '';
+                if (!empty($product->product_images)) {
+                    $images = explode(',', $product->product_images);
+                    $fullUrls = [];
+
+                    foreach ($images as $image) {
+                        $fullUrls[] = env('DOMAIN_WEB') . getUrlImageVideoProduct($product->product_create_time, 1) . $image;
+                    }
+
+                    $product->product_images_full = implode(',', $fullUrls);
+                }
+
+                if (!empty($product->product_videos)) {
+                    $videos = explode(',', $product->product_videos);
+                    $fullUrls = [];
+
+                    foreach ($videos as $video) {
+                        $fullUrls[] = env('DOMAIN_WEB') . getUrlImageVideoProduct($product->product_create_time, 2) . $video;
+                    }
+
+                    $product->product_videos_full = implode(',', $fullUrls);
+                }
+            }
+
+            return [
+                'success' => true,
+                'message' => "Lấy sản phẩm thành công",
+                'httpCode' => 200,
+                'data' => $products,
+            ];
+
+        } catch (\Exception $e) {
+
+            \Log::error("Lỗi khi tạo sản phẩm", [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => "Lỗi server, vui lòng thử lại sau.",
+                'httpCode' => 500,
+                'data' => [],
+            ];
+        }
+    }
+
+    public function getProductFeatured(array $data)
+    {
+        try {
+
+            $page = $data['page'] ?? 1;
+            $pageSize = $data['pageSize'] ?? 8;
+
+            $query = $this->Products->query();
+            // Lọc theo điều kiện nếu có
+            if (!empty($data['product_name'])) {
+                $query->where('product_name', 'LIKE', "%{$data['product_name']}%");
+            }
+
+            if (!empty($data['product_id'])) {
+                $query->where('product_id', $data['product_id']);
+            }
+
+            if (!empty(!empty($data['product_time_start']) && !empty($data['product_time_end']))) {
+                $query->whereBetween("product_create_time", [$data['product_time_start'], $data['product_time_end']]);
+            }
+            // sắp xếp
+            $query->where('product_active', 1)
+                ->orderBy('product_sold', 'desc')
+                ->orderBy('product_create_time', 'desc');
+
+            // relation với product variant
             $query->with('productVariants');
             $products = $query->paginate($pageSize, ['*'], 'page', $page);
 
@@ -187,7 +349,6 @@ class ProductRepository implements ProductRepositoryInterface
         }
     }
 
-
     public function create(array $data)
     {
         try {
@@ -257,7 +418,7 @@ class ProductRepository implements ProductRepositoryInterface
                     return $this->productVariants->create([
                         'product_id' => $product->product_id,
                         'variant_code' => $product->product_code,
-                        'product_price' => $variant['product_price'],
+                        'product_price' => str_replace(',', '', $variant['product_price']),
                         'product_stock' => $variant['product_stock'],
                         'product_color' => $variant['product_color'],
                         'variant_create_time' => $timestamp,

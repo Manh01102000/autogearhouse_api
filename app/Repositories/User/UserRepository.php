@@ -360,10 +360,13 @@ class UserRepository implements UserRepositoryInterface
             $user = Auth::user();
 
             /** === Lấy dữ liệu chi tiết của người dùng === */
+            $user_name = '';
             if ($user->user_role == '2') {
                 $user = User::with('Employees')->find($user->user_id);
+                $user_name = $user->employees['0']->employee_name;
             } elseif ($user->user_role == '1') {
                 $user = User::with('Customers')->find($user->user_id);
+                $user_name = $user->customers['0']->customer_name;
             }
 
             /** === Trả kết quả === */
@@ -372,7 +375,13 @@ class UserRepository implements UserRepositoryInterface
                 'message' => "Đăng nhập tài khoản thành công",
                 'httpCode' => 201,
                 'data' => [
-                    'user' => $user,
+                    'user' => [
+                        'user_id' => $user->user_id,
+                        'user_role' => $user->user_role,
+                        'user_authentic' => $user->user_authentic,
+                        'user_create_time' => $user->user_create_time,
+                        'user_name' => $user_name,
+                    ],
                     'token' => $token,
                 ]
             ];
