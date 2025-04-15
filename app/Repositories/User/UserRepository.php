@@ -318,12 +318,23 @@ class UserRepository implements UserRepositoryInterface
                             'data' => [],
                         ];
                 }
+                /** === Tạo token bằng JWT === **/
+                $token = JWTAuth::fromUser($user);
 
                 return [
                     'success' => true,
                     'message' => "Đăng ký tài khoản thành công",
                     'httpCode' => 201,
-                    'data' => ['user' => $user],
+                    'data' => [
+                        'user' => [
+                            'user_id' => $user->user_id,
+                            'user_role' => $user->user_role,
+                            'user_authentic' => $user->user_authentic,
+                            'user_create_time' => $user->user_create_time,
+                            'user_name' => $data['emp_name'],
+                        ],
+                        'token' => $token,
+                    ],
                 ];
             });
 
