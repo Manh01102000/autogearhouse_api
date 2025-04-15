@@ -66,17 +66,7 @@ class AuthController extends Controller
             ]);
 
             if ($response['success']) {
-                $user = $response['data']['user'];
-
-                /** === Tạo token bằng JWT === **/
-                $token = JWTAuth::fromUser($user);
-
-                $data_mess = [
-                    'data' => $user,
-                    'token' => $token,
-                ];
-
-                return apiResponse("success", $response['message'], $data_mess, true, $response['httpCode']);
+                return apiResponse("success", $response['message'], $response['data'], true, $response['httpCode']);
             } else {
                 return apiResponse('error', $response['message'], $response['data'], false, $response['httpCode']);
             }
