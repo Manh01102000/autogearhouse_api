@@ -64,4 +64,10 @@ class Employees extends Model
     {
         return $this->hasMany(Comment::class, 'comment_employee_id', 'employee_id');
     }
+
+    // Với ManageDiscount
+    public function ManageDiscount()
+    {
+        return $this->hasMany(ManageDiscount::class, 'discount_employee_id', 'employee_id');
+    }
 }

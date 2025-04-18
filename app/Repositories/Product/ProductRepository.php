@@ -290,7 +290,8 @@ class ProductRepository implements ProductRepositoryInterface
     public function getById($id)
     {
         try {
-            $products = $this->Products->with('productVariants')->find($id); // Tìm sản phẩm theo ID
+            // Tìm sản phẩm theo ID
+            $products = $this->Products->with(['productVariants', 'ManageDiscount'])->find($id);
 
             if (!$products) {
                 return [
@@ -327,11 +328,16 @@ class ProductRepository implements ProductRepositoryInterface
                 $products->product_videos_full = implode(',', $fullUrls);
             }
 
+            $productSuggest = [];
+
             return [
                 'success' => true,
                 'message' => "Lấy sản phẩm thành công",
                 'httpCode' => 200,
-                'data' => ['product' => $products],
+                'data' => [
+                    'product' => $products,
+                    'productSuggest' => $productSuggest,
+                ],
             ];
         } catch (\Exception $e) {
             \Log::error("Lỗi khi lấy sản phẩm", [

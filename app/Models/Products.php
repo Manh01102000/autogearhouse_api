@@ -83,4 +83,10 @@ class Products extends Model
     {
         return $this->hasMany(ProductVariants::class, 'product_id', 'product_id');
     }
+
+    // Quan hệ với ManageDiscount
+    public function ManageDiscount()
+    {
+        return $this->hasMany(ManageDiscount::class, 'discount_product_id', 'product_id');
+    }
 }
