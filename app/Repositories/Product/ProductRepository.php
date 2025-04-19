@@ -7,6 +7,7 @@ use App\Repositories\Product\ProductRepositoryInterface;
 use App\Models\Employees;
 use App\Models\Products;
 use App\Models\ProductVariants;
+use App\Models\ManageDiscount;
 // Import db transaction
 use Illuminate\Support\Facades\DB;
 
@@ -15,12 +16,14 @@ class ProductRepository implements ProductRepositoryInterface
     protected $employees;
     protected $Products;
     protected $productVariants;
+    protected $manageDiscount;
 
-    public function __construct(Employees $employees, Products $Products, ProductVariants $productVariants)
+    public function __construct(Employees $employees, Products $Products, ProductVariants $productVariants, ManageDiscount $manageDiscount)
     {
         $this->employees = $employees;
         $this->Products = $Products;
         $this->productVariants = $productVariants;
+        $this->manageDiscount = $manageDiscount;
     }
 
     public function getAll()
@@ -433,6 +436,21 @@ class ProductRepository implements ProductRepositoryInterface
                 })->toArray();
             }
 
+            // Thêm khuyến mãi nếu có
+            if (!empty($data['discount_type']) && !empty($data['discount_price'])) {
+                $this->manageDiscount->create([
+                    'discount_employee_id' => $employee_id,
+                    'discount_product_id' => $product->product_id,
+                    'discount_active' => 1,
+                    'discount_type' => $data['discount_type'],
+                    'discount_price' => $data['discount_price'],
+                    'discount_start_time' => $data['discount_start_time'],
+                    'discount_end_time' => $data['discount_end_time'],
+                    'discount_create_time' => $timestamp,
+                    'discount_update_time' => $timestamp,
+                ]);
+            }
+
             // Commit transaction nếu không có lỗi
             DB::commit();
 
@@ -470,6 +488,7 @@ class ProductRepository implements ProductRepositoryInterface
             // Bắt đầu transaction
             DB::beginTransaction();
             // Lấy dữ liệu nhân viên
+            // Lấy dữ liệu nhân viên
             $dbemployee = $this->employees::where('employee_user_id', $data['user_id'])->first();
             if (!$dbemployee) {
                 DB::rollBack();
@@ -480,6 +499,7 @@ class ProductRepository implements ProductRepositoryInterface
                     'data' => [],
                 ];
             }
+            $employee_id = $dbemployee->employee_id;
             // Ảnh đã bị xóa bên font-end
             $product_images_del = $data["product_images_del"] ?? null;
             // Video đã bị xóa bên font-end
@@ -570,12 +590,36 @@ class ProductRepository implements ProductRepositoryInterface
                 })->toArray();
             }
 
+            // Thêm + sửa khuyến mãi nếu có
+            $isUpdate = !empty($data['discount_id']);
+
+            $discountData = [
+                'discount_active' => 1,
+                'discount_type' => $data['discount_type'],
+                'discount_price' => $data['discount_price'],
+                'discount_start_time' => $data['discount_start_time'],
+                'discount_end_time' => $data['discount_end_time'],
+                'discount_update_time' => $timestamp,
+            ];
+
+            if ($isUpdate) {
+                $this->manageDiscount
+                    ->where('discount_id', $data['discount_id'])
+                    ->update($discountData);
+            } else {
+                $discountData['discount_employee_id'] = $employee_id;
+                $discountData['discount_product_id'] = $dataproduct->product_id;
+                $discountData['discount_create_time'] = $timestamp;
+
+                $this->manageDiscount->create($discountData);
+            }
+
             // Commit transaction nếu không có lỗi
             DB::commit();
 
             return [
                 'success' => true,
-                'message' => "Thêm mới sản phẩm thành công",
+                'message' => "Sửa sản phẩm thành công",
                 'httpCode' => 201,
                 'data' => [
                     'product' => $product,
@@ -585,7 +629,7 @@ class ProductRepository implements ProductRepositoryInterface
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction nếu có lỗi
 
-            \Log::error("Lỗi khi tạo sản phẩm", [
+            \Log::error("Lỗi khi sửa sản phẩm", [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),

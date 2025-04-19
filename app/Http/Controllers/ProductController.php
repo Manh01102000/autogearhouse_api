@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 // 
 use App\Repositories\Product\ProductRepositoryInterface;
+use Psy\Readline\Hoa\Console;
 // 
 class ProductController extends Controller
 {
@@ -106,6 +107,14 @@ class ProductController extends Controller
                 'product_newold' => $request->get('product_newold') ?? 0,
                 'product_sold' => $request->get('product_sold') ?? 0,
                 'product_variants' => $request->get('product_variants'),
+                // Loại giảm giá
+                'discount_type' => $request->get('discount_type'),
+                // mức giảm giá
+                'discount_price' => $request->get('discount_price'),
+                // Thời gian bắt đầu giảm giá
+                'discount_start_time' => $request->get('discount_start_time'),
+                // Thời gian kết thúc giảm giá
+                'discount_end_time' => $request->get('discount_end_time'),
             ];
             // var_dump($data);
             // return apiResponse('error', "Dữ liệu product_variants không hợp lệ", $data, false, 400);
@@ -223,7 +232,18 @@ class ProductController extends Controller
                 'product_images_del' => $request->get('product_images_del') ?? '',
                 // video bị xóa
                 'product_videos_del' => $request->get('product_videos_del') ?? '',
+                // Loại giảm giá
+                'discount_type' => $request->get('discount_type'),
+                // mức giảm giá
+                'discount_price' => $request->get('discount_price'),
+                // Thời gian bắt đầu giảm giá
+                'discount_start_time' => $request->get('discount_start_time'),
+                // Thời gian kết thúc giảm giá
+                'discount_end_time' => $request->get('discount_end_time'),
+                // id bảng discount
+                'discount_id' => $request->get('discount_id'),
             ];
+
 
             // Gọi repository update
             $response = $this->ProductRepository->update($id, $data);
