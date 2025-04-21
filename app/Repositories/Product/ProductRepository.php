@@ -76,6 +76,14 @@ class ProductRepository implements ProductRepositoryInterface
                 $query->whereBetween("product_create_time", [$data['product_time_start'], $data['product_time_end']]);
             }
 
+            if (!empty($data['category'])) {
+                $query->where('category', $data['category']);
+            }
+
+            if (!empty($data['category_code'])) {
+                $query->where('category_code', $data['category_code']);
+            }
+
             // Sắp xếp
             $query->orderBy('product_id', 'desc')
                 ->orderBy('product_create_time', 'desc');
@@ -331,7 +339,16 @@ class ProductRepository implements ProductRepositoryInterface
                 $products->product_videos_full = implode(',', $fullUrls);
             }
 
-            $productSuggest = [];
+            // Lấy sản phẩm gợi ý
+            $productSuggest = $this->Products->with(['productVariants', 'ManageDiscount'])
+                ->where('product_id', '!=', $id)
+                ->where(function ($query) use ($products) {
+                    $query->where('category', $products->category)
+                        ->orWhere('category_code', $products->category_code);
+                })
+                ->where('product_name', 'like', '%' . $products->product_name . '%')
+                ->limit(8)
+                ->get();
 
             return [
                 'success' => true,

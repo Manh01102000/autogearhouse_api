@@ -262,7 +262,6 @@ class ProductController extends Controller
         }
     }
 
-
     public function getAll()
     {
         try {
